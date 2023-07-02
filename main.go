@@ -7,6 +7,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	fiberLogger "github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/joho/godotenv"
 )
 
@@ -19,6 +21,11 @@ func main() {
 	api.Use(cors.New(cors.Config{
 		AllowOrigins: configs.AllowOrigins,
 		AllowHeaders: configs.AllowHeaders,
+	}))
+
+	api.Use(requestid.New())
+	api.Use(fiberLogger.New(fiberLogger.Config{
+		Format: "${pid} ${locals:requestid} ${status} - ${method} ${path}​\n",
 	}))
 
 	logger.Info("Starting the api...")

@@ -2,6 +2,7 @@ package loggerFactory
 
 import (
 	"log"
+	"os"
 
 	"github.com/codefresco/go-build-service/config"
 	"go.uber.org/zap"
@@ -47,6 +48,9 @@ func GetLogger() *zap.Logger {
 		EncoderConfig:    encoderConfig,
 		OutputPaths:      logOutputPaths,
 		ErrorOutputPaths: logErrorPaths,
+		InitialFields: map[string]interface{}{
+			"pid": os.Getpid(),
+		},
 	}
 
 	logger, err := config.Build(zap.AddCaller())
