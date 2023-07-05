@@ -1,13 +1,20 @@
 package router
 
 import (
+	"time"
+
 	"github.com/gofiber/fiber/v2"
 )
 
 func Start(router *fiber.App) {
 
 	router.Get("/", func(c *fiber.Ctx) error {
-		return c.Status(200).SendString("Works!")
+		response := map[string]interface{}{
+			"message": "Works!",
+			"status":  200,
+		}
+		time.Sleep(100 * time.Millisecond)
+		return c.Status(200).JSON(response)
 	})
 
 	router.Use(func(c *fiber.Ctx) error {

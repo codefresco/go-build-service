@@ -3,13 +3,21 @@ package loggerFactory
 import (
 	"log"
 	"os"
+	"sync"
 
 	"github.com/codefresco/go-build-service/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-func GetLogger() *zap.Logger {
+var (
+	onceLogger    sync.Once
+	logger        *zap.Logger
+	onceSugared   sync.Once
+	sugaredLogger *zap.SugaredLogger
+)
+
+func CreateLogger() *zap.Logger {
 	configs := config.GetConfig()
 
 	var logDevelopment bool
@@ -31,7 +39,7 @@ func GetLogger() *zap.Logger {
 		TimeKey:        "time",
 		LevelKey:       "level",
 		NameKey:        "logger",
-		CallerKey:      "caller",
+		CallerKey:      "source",
 		MessageKey:     "message",
 		StacktraceKey:  "stacktrace",
 		LineEnding:     zapcore.DefaultLineEnding,
@@ -49,14 +57,33 @@ func GetLogger() *zap.Logger {
 		OutputPaths:      logOutputPaths,
 		ErrorOutputPaths: logErrorPaths,
 		InitialFields: map[string]interface{}{
-			"pid": os.Getpid(),
+			"pid":     os.Getpid(),
+			"version": configs.Version,
 		},
 	}
 
-	logger, err := config.Build(zap.AddCaller())
+	loggerInstance, err := config.Build(zap.AddCaller())
 	if err != nil {
 		log.Fatalf("could not initialize logger: %v", err)
 		panic("Fatal error")
 	}
+	return loggerInstance
+}
+
+func CreateSugaredLogger() *zap.SugaredLogger {
+	return CreateLogger().Sugar()
+}
+
+func GetLogger() *zap.Logger {
+	onceLogger.Do(func() {
+		logger = CreateLogger()
+	})
 	return logger
+}
+
+func GetSugaredLogger() *zap.SugaredLogger {
+	onceSugared.Do(func() {
+		sugaredLogger = CreateSugaredLogger()
+	})
+	return sugaredLogger
 }

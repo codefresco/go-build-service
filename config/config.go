@@ -13,6 +13,7 @@ type Config struct {
 	Port         string `env:"PORT" envDefault:"3000"`
 	AllowOrigins string `env:"ALLOW_ORIGINS,required"`
 	AllowHeaders string `env:"ALLOW_HEADERS,required"`
+	Version      string `env:"VERSION,required"`
 }
 
 var (
