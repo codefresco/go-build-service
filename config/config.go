@@ -14,6 +14,7 @@ type Config struct {
 	AllowOrigins string `env:"ALLOW_ORIGINS,required"`
 	AllowHeaders string `env:"ALLOW_HEADERS,required"`
 	Version      string `env:"VERSION,required"`
+	PostgresUrl  string `env:"POSTGRES_URL,required"`
 }
 
 var (

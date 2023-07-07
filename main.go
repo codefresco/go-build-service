@@ -3,6 +3,7 @@ package main
 import (
 	router "github.com/codefresco/go-build-service/api"
 	"github.com/codefresco/go-build-service/config"
+	postgres "github.com/codefresco/go-build-service/database"
 	"github.com/codefresco/go-build-service/loggerFactory"
 	loggerMiddleware "github.com/codefresco/go-build-service/middleware"
 
@@ -18,6 +19,8 @@ func main() {
 	godotenv.Load()
 	configs := config.GetConfig()
 	logger := loggerFactory.GetSugaredLogger()
+
+	postgres.Connect()
 
 	api := fiber.New()
 	api.Use(helmet.New())
