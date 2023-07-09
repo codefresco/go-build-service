@@ -14,7 +14,7 @@ type Config struct {
 	AllowOrigins string `env:"ALLOW_ORIGINS,required"`
 	AllowHeaders string `env:"ALLOW_HEADERS,required"`
 	Version      string `env:"VERSION,required"`
-	PostgresUrl  string `env:"POSTGRES_URL,required"`
+	PostgresURL  string `env:"POSTGRES_URL,required"`
 }
 
 var (
@@ -27,7 +27,6 @@ func GetConfig() *Config {
 		cfg = &Config{}
 		if err := env.Parse(cfg); err != nil {
 			log.Fatalf("could not load env: %v", err)
-			panic("Fatal error")
 		}
 	})
 	return cfg

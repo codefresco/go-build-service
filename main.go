@@ -4,8 +4,8 @@ import (
 	router "github.com/codefresco/go-build-service/api"
 	"github.com/codefresco/go-build-service/config"
 	postgres "github.com/codefresco/go-build-service/database"
-	"github.com/codefresco/go-build-service/loggerFactory"
-	loggerMiddleware "github.com/codefresco/go-build-service/middleware"
+	"github.com/codefresco/go-build-service/loggerfactory"
+	"github.com/codefresco/go-build-service/middleware"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -18,7 +18,7 @@ import (
 func main() {
 	godotenv.Load()
 	configs := config.GetConfig()
-	logger := loggerFactory.GetSugaredLogger()
+	logger := loggerfactory.GetSugaredLogger()
 
 	postgres.Connect()
 
@@ -32,7 +32,7 @@ func main() {
 	}))
 
 	api.Use(requestid.New())
-	api.Use(loggerMiddleware.RequestLogger())
+	api.Use(middleware.RequestLogger())
 
 	logger.Infow("Starting:", "port", configs.Port)
 	router.Start(api)

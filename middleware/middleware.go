@@ -1,15 +1,15 @@
-package loggerMiddleware
+package middleware
 
 import (
 	"time"
 
-	"github.com/codefresco/go-build-service/loggerFactory"
+	"github.com/codefresco/go-build-service/loggerfactory"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 )
 
 func RequestLogger() fiber.Handler {
-	logger := loggerFactory.GetLogger()
+	logger := loggerfactory.GetLogger()
 
 	return func(c *fiber.Ctx) error {
 		start := time.Now()

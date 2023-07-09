@@ -1,4 +1,4 @@
-package loggerFactory
+package loggerfactory
 
 import (
 	"log"
@@ -65,7 +65,6 @@ func CreateLogger() *zap.Logger {
 	loggerInstance, err := config.Build(zap.AddCaller())
 	if err != nil {
 		log.Fatalf("could not initialize logger: %v", err)
-		panic("Fatal error")
 	}
 	return loggerInstance
 }
