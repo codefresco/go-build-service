@@ -1,4 +1,4 @@
-package auth
+package user
 
 type RegisterUser struct {
 	FirstName string `json:"first_name" validate:"required,min=4,max=128"`

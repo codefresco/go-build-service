@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS users (
     password_salt VARCHAR (128) NOT NULL,
     password_hash VARCHAR (128) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW (),
-    updated_at TIMESTAMP NULL
+    updated_at TIMESTAMP WITH TIME ZONE NULL,
+    deleted_at TIMESTAMP WITH TIME ZONE NULL
 );
