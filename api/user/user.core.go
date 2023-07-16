@@ -20,19 +20,19 @@ func CreateUser(user *RegisterUser) error {
 
 	if err != nil {
 		logger.Errorw("Error creating password hash!", "error", err)
-		return errors.New("Could not create user")
+		return ErrInternal
 	}
 	dbUser.PasswordHash = passwordHash
 	dbUser.PasswordSalt = passwordSalt
 	result := postgres.DB.Create(dbUser)
 
-	if strings.Contains(result.Error.Error(), "ERROR: duplicate key") {
-		return errors.New("User already exists!")
+	if result.Error != nil && strings.Contains(result.Error.Error(), "ERROR: duplicate key") {
+		return ErrAlreadyEsists
 	}
 
 	if result.Error != nil {
 		logger.Errorw("Error writing user to database!", "error", result.Error)
-		return result.Error
+		return ErrInternal
 	}
 	return nil
 }
@@ -43,12 +43,12 @@ func FindUser(user *LoginUser) (User, error) {
 	result := postgres.DB.First(&dbUser, User{Email: user.Email})
 
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return dbUser, result.Error
+		return dbUser, ErrNotFound
 	}
 
 	if result.Error != nil {
 		logger.Errorw("Error reading user from database!", "error", result.Error)
-		return dbUser, errors.New("Could not find user")
+		return dbUser, ErrInternal
 	}
 
 	return dbUser, nil

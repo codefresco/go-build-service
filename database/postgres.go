@@ -17,19 +17,17 @@ func Connect() {
 	logger := loggerfactory.GetSugaredLogger()
 	configs := config.GetConfig()
 
-	logger.Infow("Connecting to postgres...")
+	for attempt := 0; attempt < 3; attempt++ {
+		time.Sleep(time.Second * time.Duration(attempt*attempt))
+		logger.Infow("Connecting to postgres...", "attempt", attempt+1)
 
-	for attempt := 1; attempt <= 3; attempt++ {
 		DB, err = gorm.Open(postgres.Open(configs.PostgresURL), &gorm.Config{})
-		if err != nil {
-			logger.Warnw("Postgres connection attempt failed. Retrying...", "attempt", attempt)
-			time.Sleep(time.Second * time.Duration(attempt*attempt))
-
-			continue
+		if err == nil {
+			logger.Infow("Connected to postgres!")
+			return
 		}
+		logger.Warnw("Failed to connected to postgres!", "error", err)
 	}
 
-	if err != nil {
-		logger.Fatalw("Failed to connected to postgres! Terminating...", "error", err)
-	}
+	logger.Fatalw("Failed to connected to postgres! Terminating...", "error", err)
 }
