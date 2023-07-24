@@ -3,6 +3,7 @@ package middleware
 import (
 	"time"
 
+	jwt "github.com/codefresco/go-build-service/libs/token"
 	"github.com/codefresco/go-build-service/loggerfactory"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -50,6 +51,23 @@ func Validator(body interface{}) fiber.Handler {
 		}
 
 		c.Locals("body", body)
+		return c.Next()
+	}
+}
+
+func Authenticated() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		authHeader := c.Get("Authorization")
+
+		claims, err := jwt.ValidateToken(authHeader)
+		if err != nil {
+			return c.Status(403).JSON(fiber.Map{
+				"message": "Invalid token!",
+				"error":   err.Error(),
+			})
+		}
+
+		c.Locals("claims", claims)
 		return c.Next()
 	}
 }
