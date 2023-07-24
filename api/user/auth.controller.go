@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/codefresco/go-build-service/libs/pass"
+	jwt "github.com/codefresco/go-build-service/libs/token"
 	"github.com/codefresco/go-build-service/loggerfactory"
 	"github.com/gofiber/fiber/v2"
 )
@@ -39,9 +40,21 @@ func Login(c *fiber.Ctx) error {
 		return authErrorHandler(c, ErrPermissionDenied)
 	}
 
+	accessToken, accessTokenError := jwt.GenerateAuthToken(dbUser.Email)
+	if accessTokenError != nil {
+		return authErrorHandler(c, ErrPermissionDenied)
+	}
+
+	refreshToken, refreshTokenError := jwt.GenerateRefreshToken(dbUser.Email)
+	if refreshTokenError != nil {
+		return authErrorHandler(c, ErrPermissionDenied)
+	}
+
 	return c.Status(200).JSON(fiber.Map{
-		"message": "Login successful!",
-		"user":    loginDetails.Email,
+		"message":       "Login successful!",
+		"user":          loginDetails.Email,
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
 	})
 }
 
