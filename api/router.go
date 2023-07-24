@@ -18,7 +18,8 @@ func Start(router *fiber.App) {
 		return c.Status(200).JSON(response)
 	})
 
-	user.UseAuthRouter(router.Group("/auth"))
+	user.AuthRouter(router.Group("/auth"))
+	user.UserRouter(router.Group("/user"))
 
 	router.Use(func(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{
