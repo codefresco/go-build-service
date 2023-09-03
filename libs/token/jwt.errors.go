@@ -3,5 +3,5 @@ package jwt
 import "errors"
 
 var (
-	ErrUnauthorized = errors.New("Unauthorized!")
+	ErrUnauthorized = errors.New("unauthorized")
 )

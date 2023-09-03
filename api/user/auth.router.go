@@ -7,5 +7,7 @@ import (
 
 func AuthRouter(router fiber.Router) {
 	router.Post("/login", middleware.Validator(new(LoginUser)), Login)
+	router.Post("/logout", middleware.Authenticated(), Logout)
+	router.Post("/refresh", Refresh)
 	router.Post("/register", middleware.Validator(new(RegisterUser)), Register)
 }

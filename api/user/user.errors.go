@@ -3,8 +3,8 @@ package user
 import "errors"
 
 var (
-	ErrPermissionDenied = errors.New("Permission denied!")
-	ErrAlreadyEsists    = errors.New("User already exists!")
-	ErrNotFound         = errors.New("User not found!")
-	ErrInternal         = errors.New("Internal error!")
+	ErrPermissionDenied = errors.New("permission denied")
+	ErrAlreadyEsists    = errors.New("user already exists")
+	ErrNotFound         = errors.New("user not found")
+	ErrInternal         = errors.New("internal error")
 )

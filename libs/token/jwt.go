@@ -10,36 +10,37 @@ import (
 
 type MapClaims = jwt.MapClaims
 
-func generateJWT(subject string, ttl time.Duration) (string, error) {
+func generateJWT(subject string, ttl time.Duration) (string, uuid.UUID, error) {
 	configs := config.GetConfig()
+	jti := uuid.New()
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, MapClaims{
-		"sub":  subject,
-		"exp":  time.Now().Add(ttl).Unix(),
-		"iat":  time.Now().Unix(),
-		"iss":  configs.Version,
-		"uuid": uuid.New(),
+		"sub": subject,
+		"exp": time.Now().Add(ttl).Unix(),
+		"iat": time.Now().Unix(),
+		"iss": configs.Version,
+		"jti": jti,
 	})
 
 	signedToken, err := token.SignedString([]byte(configs.JWTSecret))
 
-	return signedToken, err
+	return signedToken, jti, err
 }
 
-func GenerateAuthToken(email string) (string, error) {
+func GenerateTokenPair(email string) (string, string, uuid.UUID, uuid.UUID, error) {
 	configs := config.GetConfig()
 
-	signedToken, err := generateJWT(email, configs.AccessTokenExpiry)
+	refreshToken, refreshJti, refreshTokenError := generateJWT(email, configs.RefreshTokenExpiry)
+	if refreshTokenError != nil {
+		return "", "", uuid.Nil, uuid.Nil, refreshTokenError
+	}
 
-	return signedToken, err
-}
+	accessToken, accessJti, accessTokenError := generateJWT(email, configs.AccessTokenExpiry)
+	if accessTokenError != nil {
+		return "", "", uuid.Nil, uuid.Nil, accessTokenError
+	}
 
-func GenerateRefreshToken(email string) (string, error) {
-	configs := config.GetConfig()
-
-	signedToken, err := generateJWT(email, configs.RefreshTokenExpiry)
-
-	return signedToken, err
+	return accessToken, refreshToken, accessJti, refreshJti, nil
 }
 
 func ValidateToken(jwtToken string) (MapClaims, error) {
