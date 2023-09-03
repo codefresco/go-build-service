@@ -7,9 +7,7 @@ Rest service template in go
 To run postgres and adminer, use make as below:
 
 `make devenv-up` runs postgres and adminer containers. You will need to have docker and make installed and ready.
-Access adminer on `localhost:8080` and install the uuid extension on postgres:
-
-`CREATE EXTENSION "uuid-ossp";`
+Adminer can be accessed on `localhost:8080`.
 
 ### Migrations
 
@@ -26,7 +24,7 @@ Roll back migrations: `make migrate-down`
 See the `makefile` for teardown and other commands.
 
 
-## Implemented so far
+## Implemented
 
 - Base api using fiber
 - Environment variable loading and validation
@@ -34,10 +32,10 @@ See the `makefile` for teardown and other commands.
 - Postgres database
 - Database migrations
 - Tooling and lint
+- Authentication
 
 ## To be implemented
 
-- Authentication
 - Dockerizing
 - Tests
 - Event processing
