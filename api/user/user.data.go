@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateUser(user *RegisterUser) error {
+func CreateUser(user *UserRegisteration) error {
 	logger := loggerfactory.GetSugaredLogger()
 	dbUser := &User{}
 	dbUser.FirstName = user.FirstName
@@ -27,7 +27,7 @@ func CreateUser(user *RegisterUser) error {
 	result := postgres.DB.Create(dbUser)
 
 	if result.Error != nil && strings.Contains(result.Error.Error(), "ERROR: duplicate key") {
-		return ErrAlreadyEsists
+		return ErrAlreadyExists
 	}
 
 	if result.Error != nil {
@@ -37,10 +37,11 @@ func CreateUser(user *RegisterUser) error {
 	return nil
 }
 
-func FindUser(user *LoginUser) (User, error) {
+func FindUser(user *UserCredentials) (User, error) {
 	logger := loggerfactory.GetSugaredLogger()
 	dbUser := User{}
-	result := postgres.DB.First(&dbUser, User{Email: user.Email})
+	userDetails := UserDetails{Email: user.Email}
+	result := postgres.DB.First(&dbUser, User{UserDetails: userDetails})
 
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return dbUser, ErrNotFound

@@ -8,7 +8,7 @@ import (
 func GetUserDetails(c *fiber.Ctx) error {
 	claims := c.Locals("claims").(jwt.MapClaims)
 
-	userDetails, err := FindUser(&LoginUser{Email: claims["sub"].(string), Password: ""})
+	userDetails, err := FindUser(&UserCredentials{Email: claims["sub"].(string), Password: ""})
 	if err != nil {
 		return userErrorHandler(c, err)
 	}

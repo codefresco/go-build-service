@@ -1,4 +1,4 @@
-package user
+package token
 
 import (
 	"errors"
@@ -14,7 +14,7 @@ func CreateToken(token *Token) error {
 	result := postgres.DB.Create(token)
 
 	if result.Error != nil && strings.Contains(result.Error.Error(), "ERROR: duplicate key") {
-		return ErrAlreadyEsists
+		return ErrAlreadyExists
 	}
 
 	if result.Error != nil {
@@ -55,7 +55,7 @@ func UpdateToken(token *Token) error {
 
 func DeleteToken(token *Token) error {
 	logger := loggerfactory.GetSugaredLogger()
-	result := postgres.DB.Delete(&token)
+	result := postgres.DB.Where(token).Delete(token)
 
 	if result.Error != nil {
 		logger.Errorw("Error deleting token from database!", "error", result.Error)

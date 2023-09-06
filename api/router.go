@@ -3,6 +3,7 @@ package router
 import (
 	"time"
 
+	"github.com/codefresco/go-build-service/api/auth"
 	"github.com/codefresco/go-build-service/api/user"
 	"github.com/gofiber/fiber/v2"
 )
@@ -18,7 +19,7 @@ func Start(router *fiber.App) {
 		return c.Status(200).JSON(response)
 	})
 
-	user.AuthRouter(router.Group("/auth"))
+	auth.AuthRouter(router.Group("/auth"))
 	user.UserRouter(router.Group("/user"))
 
 	router.Use(func(c *fiber.Ctx) error {

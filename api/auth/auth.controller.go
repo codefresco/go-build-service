@@ -1,6 +1,8 @@
-package user
+package auth
 
 import (
+	"github.com/codefresco/go-build-service/api/token"
+	"github.com/codefresco/go-build-service/api/user"
 	"github.com/codefresco/go-build-service/libs/pass"
 	jwt "github.com/codefresco/go-build-service/libs/token"
 	"github.com/codefresco/go-build-service/loggerfactory"
@@ -9,9 +11,9 @@ import (
 )
 
 func Register(c *fiber.Ctx) error {
-	userDetails := c.Locals("body").(*RegisterUser)
+	userDetails := c.Locals("body").(*user.UserRegisteration)
 
-	err := CreateUser(userDetails)
+	err := user.CreateUser(userDetails)
 	if err != nil {
 		return authErrorHandler(c, err)
 	}
@@ -24,9 +26,9 @@ func Register(c *fiber.Ctx) error {
 
 func Login(c *fiber.Ctx) error {
 	logger := loggerfactory.GetSugaredLogger()
-	loginDetails := c.Locals("body").(*LoginUser)
+	loginDetails := c.Locals("body").(*user.UserCredentials)
 
-	dbUser, err := FindUser(loginDetails)
+	dbUser, err := user.FindUser(loginDetails)
 	if err != nil {
 		return authErrorHandler(c, err)
 	}
@@ -46,7 +48,7 @@ func Login(c *fiber.Ctx) error {
 		return authErrorHandler(c, ErrPermissionDenied)
 	}
 
-	CreateToken(&Token{UserID: dbUser.ID, AccessJwtID: accessJti, RefreshJwtID: refreshJti})
+	token.CreateToken(&token.Token{UserID: dbUser.ID, AccessJwtID: accessJti, RefreshJwtID: refreshJti})
 
 	return c.Status(200).JSON(fiber.Map{
 		"message":       "Login successful!",
@@ -59,12 +61,17 @@ func Login(c *fiber.Ctx) error {
 func Logout(c *fiber.Ctx) error {
 	claims := c.Locals("claims").(jwt.MapClaims)
 
-	userDetails, err := FindUser(&LoginUser{Email: claims["sub"].(string)})
+	userDetails, err := user.FindUser(&user.UserCredentials{Email: claims["sub"].(string)})
 	if err != nil {
 		return authErrorHandler(c, err)
 	}
 
-	err = DeleteToken(&Token{UserID: userDetails.ID, AccessJwtID: claims["jti"].(uuid.UUID)})
+	accessJwtID, err := uuid.Parse(claims["jti"].(string))
+	if err != nil {
+		return authErrorHandler(c, err)
+	}
+
+	err = token.DeleteToken(&token.Token{UserID: userDetails.ID, AccessJwtID: accessJwtID})
 	if err != nil {
 		return authErrorHandler(c, err)
 	}
@@ -86,17 +93,17 @@ func Refresh(c *fiber.Ctx) error {
 		})
 	}
 
-	userDetails, err := FindUser(&LoginUser{Email: claims["sub"].(string)})
+	userDetails, err := user.FindUser(&user.UserCredentials{Email: claims["sub"].(string)})
 	if err != nil {
 		return authErrorHandler(c, err)
 	}
 
-	RefreshJwtID, err := uuid.Parse(claims["jti"].(string))
+	refreshJwtID, err := uuid.Parse(claims["jti"].(string))
 	if err != nil {
 		return authErrorHandler(c, err)
 	}
 
-	token, err := FindToken(&Token{UserID: userDetails.ID, RefreshJwtID: RefreshJwtID})
+	tokenMeta, err := token.FindToken(&token.Token{UserID: userDetails.ID, RefreshJwtID: refreshJwtID})
 	if err != nil {
 		return authErrorHandler(c, err)
 	}
@@ -106,11 +113,11 @@ func Refresh(c *fiber.Ctx) error {
 		return authErrorHandler(c, ErrPermissionDenied)
 	}
 
-	token.AccessJwtID = accessJti
-	token.RefreshJwtID = refreshJti
-	token.UserID = userDetails.ID
+	tokenMeta.AccessJwtID = accessJti
+	tokenMeta.RefreshJwtID = refreshJti
+	tokenMeta.UserID = userDetails.ID
 
-	err = UpdateToken(&token)
+	err = token.UpdateToken(&tokenMeta)
 	if err != nil {
 		return authErrorHandler(c, err)
 	}
@@ -125,16 +132,18 @@ func Refresh(c *fiber.Ctx) error {
 
 func authErrorHandler(c *fiber.Ctx, err error) error {
 	switch err {
-	case ErrAlreadyEsists:
+	case user.ErrAlreadyExists:
 		return c.Status(409).JSON(fiber.Map{
 			"message": "Could not create user!",
 			"error":   err.Error(),
 		})
-	case ErrNotFound:
+	case user.ErrNotFound:
 		return c.Status(404).JSON(fiber.Map{
 			"message": "User does not exist!",
 			"error":   err.Error(),
 		})
+	case token.ErrNotFound:
+		fallthrough
 	case ErrPermissionDenied:
 		return c.Status(403).JSON(fiber.Map{
 			"message": "Invalid authentication details!",
