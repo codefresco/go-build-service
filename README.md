@@ -24,7 +24,7 @@ Roll back migrations: `make migrate-down`
 See the `makefile` for teardown and other commands.
 
 
-## Implemented
+## Features
 
 - Base api using fiber
 - Environment variable loading and validation
@@ -33,8 +33,11 @@ See the `makefile` for teardown and other commands.
 - Database migrations
 - Tooling and lint
 - Authentication
+  - Stateless JWT access token
+  - Revokable (log out) refresh token using jti
+  - Authentication middleware
 
-## To be implemented
+## Roadmap
 
 - Dockerizing
 - Tests
