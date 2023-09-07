@@ -61,7 +61,7 @@ func Authenticated() fiber.Handler {
 
 		claims, err := jwt.ValidateToken(authHeader)
 		if err != nil {
-			return c.Status(403).JSON(fiber.Map{
+			return c.Status(401).JSON(fiber.Map{
 				"message": "Invalid token!",
 				"error":   err.Error(),
 			})

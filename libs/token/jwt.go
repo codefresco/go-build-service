@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"errors"
 	"time"
 
 	"github.com/codefresco/go-build-service/config"
@@ -52,6 +53,10 @@ func ValidateToken(jwtToken string) (MapClaims, error) {
 		}
 		return []byte(configs.JWTSecret), nil
 	})
+
+	if errors.Is(err, jwt.ErrTokenExpired) {
+		return nil, ErrTokenExpired
+	}
 
 	if err != nil {
 		return nil, ErrUnauthorized
