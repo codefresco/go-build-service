@@ -6,7 +6,7 @@ Rest service template in go
 
 To run postgres and adminer, use make as below:
 
-`make devenv-up` runs postgres and adminer containers. You will need to have docker and make installed and ready.
+`make dev-up` runs postgres and adminer containers. You will need to have docker and make installed and ready.
 Adminer can be accessed on `localhost:8080`.
 
 ### Migrations

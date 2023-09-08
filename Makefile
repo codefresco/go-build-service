@@ -51,14 +51,14 @@ build-tools:
 	go build -tags 'postgres' -o $(TOOLS_BIN)/migrate github.com/golang-migrate/migrate/v4/cmd/migrate && \
 	go build -o $(TOOLS_BIN)/revive github.com/mgechev/revive
 
-.PHONY: devenv-up
-devenv-up:
+.PHONY: dev-up
+dev-up:
 	docker compose -f ./devenv/docker-compose.yaml up -d
 
-.PHONY: devenv-down
-devenv-down:
+.PHONY: dev-down
+dev-down:
 	docker compose -f ./devenv/docker-compose.yaml down
 
-.PHONY: devenv-clear
-devenv-clear:
+.PHONY: dev-clear
+dev-clear:
 	docker compose -f ./devenv/docker-compose.yaml down -v --remove-orphans --rmi local
