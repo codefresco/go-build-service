@@ -51,6 +51,14 @@ build-tools:
 	go build -tags 'postgres' -o $(TOOLS_BIN)/migrate github.com/golang-migrate/migrate/v4/cmd/migrate && \
 	go build -o $(TOOLS_BIN)/revive github.com/mgechev/revive
 
+.PHONY: build
+build:
+	go build -o bin/ main.go
+
+.PHONY: run
+run: build
+	bin/main
+
 .PHONY: dev-up
 dev-up:
 	docker compose -f ./devenv/docker-compose.yaml up -d

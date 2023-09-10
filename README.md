@@ -3,6 +3,7 @@
 Rest service template in go
 
 ## Set up
+`make build-tools` to build the tools.
 
 To run postgres and adminer, use make as below:
 
@@ -18,8 +19,7 @@ Create a new migration: `make migrate-create NAME=migration_name`
 Roll back migrations: `make migrate-down`
 
 ### Running the app
-
-`go run main.go`
+`go run main.go` or `make run`
 
 See the `makefile` for teardown and other commands.
 
